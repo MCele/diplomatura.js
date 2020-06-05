@@ -23,8 +23,20 @@ import basededatos from './basededatos';
  */
 export const materiasAprobadasByNombreAlumno = (nombreAlumno) => {
   // Ejemplo de como accedo a datos dentro de la base de datos
-  // console.log(basededatos.alumnos);
-  return [];
+  //console.log(basededatos.alumnos);
+  const alumno = basededatos.alumnos.find(a => (a.nombre === nombreAlumno));
+  if (alumno) {
+    let matAprobadas = [];
+    basededatos.calificaciones.forEach((calif) => {
+      if (calif.nota >= 4 && calif.alumno === alumno.id) {
+        let mat = basededatos.materias.find(m => (m.id === calif.materia));
+        matAprobadas.push(mat);
+      }
+    });
+    return matAprobadas;
+  } else {
+    return alumno;
+  }
 };
 
 /**
@@ -69,7 +81,7 @@ export const materiasAprobadasByNombreAlumno = (nombreAlumno) => {
  * @param {string} nombreUniversidad
  */
 export const expandirInfoUniversidadByNombre = (nombreUniversidad) => {
-  return {};
+  return [];
 };
 
 // /**
