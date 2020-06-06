@@ -81,7 +81,35 @@ export const materiasAprobadasByNombreAlumno = (nombreAlumno) => {
  * @param {string} nombreUniversidad
  */
 export const expandirInfoUniversidadByNombre = (nombreUniversidad) => {
-  return [];
+  let universidad = basededatos.universidades.find(u => (u.nombre === nombreUniversidad));
+  if (universidad) {
+    universidad.materias = [];
+    universidad.profesores = [];
+    universidad.alumnos = [];
+    basededatos.materias.forEach((materia) => {
+      if (materia.universidad === universidad.id) {
+        // agrego la materia al array de materias de la universidad
+        universidad.materias.push(materia);
+        // agrego el profesor al array de profesores
+        materia.profesores.forEach((p) => {
+          let profes = basededatos.profesores;
+          for (let i = 0; i < profes.length; i++) {
+            //busco los profesores de cada materia y verifico que ya no esten incluidos en el array de profesores
+            if (profes[i].id === p && (!universidad.profesores.includes(profes[i]))) {
+              universidad.profesores.push(profes[i]);
+            }
+          }
+        });
+        let calificaciones = basededatos.calificaciones.filter(c => c.materia === materia.id);
+        calificaciones.forEach((calif) => {
+          let alumno = basededatos.alumnos.find(a => a.id === calif.alumno);
+          if (!universidad.alumnos.includes(alumno)) { universidad.alumnos.push(alumno); }
+        }
+        );
+      }
+    });
+  }
+  return universidad;
 };
 
 // /**
