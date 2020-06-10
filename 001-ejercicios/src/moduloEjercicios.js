@@ -1,4 +1,4 @@
-import basededatos from './basededatos';
+import basededatos, { database } from './basededatos';
 
 /**
  * Obtiene la lista de materias aprobadas (nota >= 4) para el nombre de alumno dado.
@@ -112,33 +112,93 @@ export const expandirInfoUniversidadByNombre = (nombreUniversidad) => {
   return universidad;
 };
 
-// /**
-//  * Devuelve el promedio de edad de los alumnos.
-//  */
-// export const promedioDeEdad = () => {
-//   return [];
-// };
+/**
+ * Devuelve el promedio de edad de los alumnos.
+ */
 
-// /**
-//  * Devuelve la lista de alumnos con promedio mayor al numero pasado
-//  * por parametro.
-//  * @param {number} promedio
-//  */
-// export const alumnosConPromedioMayorA = (promedio) => {
-//   return [];
-// };
 
-// /**
-//  * Devuelve la lista de materias sin alumnos
-//  */
-// export const materiasSinAlumnosAnotados = () => {
-//   return [];
-// };
+export const promedioDeEdad = () => {
+  const suma = (total, alumno) => total + alumno.edad;
+  let sum = database.alumnos.reduce(suma, 0)
+  if (sum)
+    return sum / database.alumnos.length;
+  return promedioArrayByAtributo(database.alumnos);
+};
 
-// /**
-//  * Devuelve el promdedio de edad segun el id de la universidad.
-//  * @param {number} universidadId
-//  */
-// export const promedioDeEdadByUniversidadId = (universidadId) => {
-//   return [];
-// };
+//realiza el promedio de un atributo numerico de un array
+function promedioArrayByAtributo(arrayDatos, atributo) {
+  // si el atributo no se envía utiliza el campo 'edad'
+  if (!atributo) atributo = 'edad';
+  const suma = (total, objeto) => total + objeto[atributo];
+  let sum = arrayDatos.reduce(suma, 0)
+  console.log(sum);
+  return (sum) ? sum / database.alumnos.length : sum;
+}
+/**
+ * Devuelve la lista de alumnos con promedio mayor al numero pasado
+ * por parametro.
+ * @param {number} promedio
+ */
+export const alumnosConPromedioMayorA = (promedio) => {
+  console.log(promedio);
+  const alumnosPromMayorA = [];
+  database.calificaciones.forEach(c => {
+    if (c.nota > promedio && !getByID(c.alumno, alumnosPromMayorA))
+      alumnosPromMayorA.push(getByID(c.alumno, database.alumnos));
+  }
+  );
+  return alumnosPromMayorA;
+};
+// parametro array de  onjetos que contienen el atributo id
+function getByID(id, arrayDatos) {
+  return arrayDatos.find(a => a.id === id);
+}
+
+/**
+ * Devuelve la lista de materias sin alumnos
+ */
+export const materiasSinAlumnosAnotados = () => {
+  let materias = [];
+  database.materias.forEach(m => {
+    // verifico que la materia no se encuentre en el array de calificaciones
+    if (!(getByIdAtributo(m.id, basededatos.calificaciones, 'materia')))
+      materias.push(m);
+  });
+  return materias;
+};
+
+// Método general para obtener un objeto por su id en un array de objetos, 
+// donde el nombre del atributo del id puede ser variable
+// arrayDatos contiene objetos json
+// "atribute" atributo de un objeto a ser comparado con el id
+function getByIdAtributo(id, arrayDatos, atributo) {
+  if (!atributo) atributo = 'id';
+  return arrayDatos.find(d => d[atributo] === id);
+}
+
+/**
+ * Devuelve el promdedio de edad segun el id de la universidad.
+ * @param {number} universidadId
+ */
+// funcion que obtiene los alumnos en una universidad por su id
+function getAlumnosByUniversidadId(universidadId) {
+  return database.alumnos.filter(a => {
+    let asigna = false;
+    // obtengo las calificaciones del alumno
+    basededatos.calificaciones.filter(c => c.alumno === a.id).forEach(
+      calif => {
+        if (!asigna) {
+          const materia = getByIdAtributo(calif.materia, basededatos.materias);
+          asigna = (materia?.universidad === universidadId);
+        }
+      });
+    return asigna;
+  });
+};
+
+export const promedioDeEdadByUniversidadId = (universidadId) => {
+  if (!universidadId) return;
+  const alumnos = getAlumnosByUniversidadId(universidadId);
+  console.log("alumnos de la Universidad:", alumnos);
+  return promedioArrayByAtributo(alumnos, 'edad');
+}

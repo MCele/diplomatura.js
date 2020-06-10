@@ -1,6 +1,10 @@
 import {
   materiasAprobadasByNombreAlumno,
   expandirInfoUniversidadByNombre,
+  promedioDeEdad,
+  alumnosConPromedioMayorA,
+  materiasSinAlumnosAnotados,
+  promedioDeEdadByUniversidadId
 } from './moduloEjercicios';
 
 import baseDeDatos from './basededatos';
@@ -32,3 +36,23 @@ const infoUniversidadRio = expandirInfoUniversidadByNombre(
   'Universidad de Rio Negro'
 );
 console.log('Info rio negro:', infoUniversidadRio);
+
+// promedioDeEdad
+console.log('------------------------------------------------------');
+console.log('Ejecutando ejercicio promedioDeEdad:', promedioDeEdad());
+
+// Devuelve la lista de alumnos con promedio mayor al numero pasado por parametro.
+console.log('------------------------------------------------------');
+console.log('Ejecutando ejercicio alumnosConPromedioMayorA(5): ');
+console.log(alumnosConPromedioMayorA(5));
+console.log('Ejecutando ejercicio alumnosConPromedioMayorA(7.4): ');
+console.log(alumnosConPromedioMayorA(7.4));
+
+// Devuelve la lista de materias sin alumnos
+console.log('------------------------------------------------------');
+console.log('Ejecutando ejercicio materiasSinAlumnosAnotados: ', materiasSinAlumnosAnotados());
+
+// Devuelve el promdedio de edad segun el id de la universidad
+console.log('------------------------------------------------------');
+console.log('Ejecutando ejercicio promedioDeEdadByUniversidadId: ', promedioDeEdadByUniversidadId(1));
+
